@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Local Storage Saver</title>
+  <script>
+    // Save data to localStorage
+    function saveToLocalStorage() {
+      const input = document.getElementById("dataInput").value;
+      localStorage.setItem("userdata", input);
+      alert("Data saved to localStorage!");
+      displayStoredData();
+    }
+
+    // Read and display data from localStorage
+    function displayStoredData() {
+      const storedData = localStorage.getItem("userdata");
+      document.getElementById("storageDisplay").textContent = storedData || "No data saved yet.";
+    }
+
+    // On page load, display the stored data
+    window.onload = displayStoredData;
+  </script>
+</head>
+<body>
+  <h1>Save Data to localStorage</h1>
+  <input type="text" id="dataInput" placeholder="Enter something...">
+  <button onclick="saveToLocalStorage()">Save</button>
+  <h2>Saved Data:</h2>
+  <p id="storageDisplay">Loading...</p>
+</body>
+</html>

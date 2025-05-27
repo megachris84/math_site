@@ -1,0 +1,175 @@
+<h2>Data Visualization Demo</h2>
+
+<p>This lesson shows how to visualize data using different plot types:</p>
+
+<ul>
+  <li>Bar Graph</li>
+  <li>Histogram</li>
+  <li>Dot Plot</li>
+  <li>Box Plot</li>
+</ul>
+
+<hr>
+
+<h3>1. Bar Graph</h3>
+<canvas id="barGraph" width="400" height="200"></canvas>
+
+<h3>2. Histogram</h3>
+<canvas id="histogram" width="400" height="200"></canvas>
+
+<h3>3. Dot Plot</h3>
+<canvas id="dotPlot" width="500" height="150" style="border:1px solid #ccc;"></canvas>
+
+<h3>4. Box Plot</h3>
+<canvas id="boxPlot" width="500" height="150" style="border:1px solid #ccc;"></canvas>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+const dataSet = [1, 2, 2, 3, 3, 3, 4, 4, 5, 6, 6, 7, 8, 9, 10];
+
+/* 1. BAR GRAPH */
+new Chart(document.getElementById('barGraph'), {
+  type: 'bar',
+  data: {
+    labels: ['Apples', 'Bananas', 'Oranges', 'Grapes'],
+    datasets: [{
+      label: 'Fruit Count',
+      data: [12, 19, 7, 5],
+      backgroundColor: 'rgba(54, 162, 235, 0.6)',
+      borderColor: 'blue',
+      borderWidth: 1
+    }]
+  },
+  options: {
+    scales: {
+      y: { beginAtZero: true }
+    }
+  }
+});
+
+/* 2. HISTOGRAM (using bar chart format) */
+function createHistogramBins(data, binSize = 2) {
+  const max = Math.max(...data);
+  const bins = {};
+  for (let i = 0; i <= max; i += binSize) {
+    bins[`${i}-${i + binSize - 1}`] = 0;
+  }
+  data.forEach(num => {
+    const binKey = `${Math.floor(num / binSize) * binSize}-${Math.floor(num / binSize) * binSize + binSize - 1}`;
+    bins[binKey]++;
+  });
+  return bins;
+}
+
+const histogramData = createHistogramBins(dataSet, 2);
+new Chart(document.getElementById('histogram'), {
+  type: 'bar',
+  data: {
+    labels: Object.keys(histogramData),
+    datasets: [{
+      label: 'Frequency',
+      data: Object.values(histogramData),
+      backgroundColor: 'rgba(255, 99, 132, 0.6)',
+      borderColor: 'red',
+      borderWidth: 1
+    }]
+  },
+  options: {
+    scales: {
+      y: { beginAtZero: true }
+    }
+  }
+});
+
+/* 3. DOT PLOT */
+function drawDotPlot(data) {
+  const canvas = document.getElementById('dotPlot');
+  const ctx = canvas.getContext('2d');
+  const counts = {};
+
+  data.forEach(value => {
+    counts[value] = (counts[value] || 0) + 1;
+  });
+
+  const keys = Object.keys(counts).map(Number).sort((a, b) => a - b);
+  const spacing = 40;
+  const radius = 5;
+  const baseY = canvas.height - 20;
+
+  ctx.font = '14px Arial';
+  ctx.textAlign = 'center';
+
+  keys.forEach((val, i) => {
+    const count = counts[val];
+    for (let j = 0; j < count; j++) {
+      ctx.beginPath();
+      ctx.arc(40 + i * spacing, baseY - j * 15, radius, 0, 2 * Math.PI);
+      ctx.fillStyle = 'steelblue';
+      ctx.fill();
+    }
+    ctx.fillText(val, 40 + i * spacing, baseY + 15);
+  });
+}
+
+drawDotPlot(dataSet);
+
+/* 4. BOX PLOT */
+function drawBoxPlot(data) {
+  const canvas = document.getElementById('boxPlot');
+  const ctx = canvas.getContext('2d');
+  const sorted = [...data].sort((a, b) => a - b);
+
+  const median = (arr) => {
+    const mid = Math.floor(arr.length / 2);
+    return arr.length % 2 !== 0
+      ? arr[mid]
+      : (arr[mid - 1] + arr[mid]) / 2;
+  };
+
+  const Q1 = median(sorted.slice(0, Math.floor(sorted.length / 2)));
+  const Q2 = median(sorted);
+  const Q3 = median(sorted.slice(Math.ceil(sorted.length / 2)));
+  const min = sorted[0];
+  const max = sorted[sorted.length - 1];
+
+  const scaleX = (x) => 50 + (x - min) * (400 / (max - min));
+
+  // Draw box
+  ctx.fillStyle = 'lightblue';
+  ctx.fillRect(scaleX(Q1), 60, scaleX(Q3) - scaleX(Q1), 30);
+  
+  // Median line
+  ctx.strokeStyle = 'blue';
+  ctx.beginPath();
+  ctx.moveTo(scaleX(Q2), 60);
+  ctx.lineTo(scaleX(Q2), 90);
+  ctx.stroke();
+
+  // Whiskers
+  ctx.beginPath();
+  ctx.moveTo(scaleX(min), 75);
+  ctx.lineTo(scaleX(Q1), 75);
+  ctx.moveTo(scaleX(Q3), 75);
+  ctx.lineTo(scaleX(max), 75);
+  ctx.stroke();
+
+  // Whisker caps
+  [min, max].forEach(val => {
+    ctx.beginPath();
+    ctx.moveTo(scaleX(val), 65);
+    ctx.lineTo(scaleX(val), 85);
+    ctx.stroke();
+  });
+
+  // Labels
+  ctx.fillStyle = 'black';
+  ctx.font = '12px Arial';
+  [min, Q1, Q2, Q3, max].forEach(val => {
+    ctx.fillText(val, scaleX(val), 50);
+  });
+}
+
+drawBoxPlot(dataSet);
+</script>
