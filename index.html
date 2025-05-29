@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Math Learning Site</title>
+  <title>Math Site</title>
   <style>
     body {
       margin: 0;
@@ -121,7 +121,7 @@
 
   <div class="topbar">
     <button class="menu-button" onclick="toggleSidebar()">☰</button>
-    <span>Math Learning Site</span>
+    <span>Math Site</span>
   </div>
 
   <div class="sidebar" id="sidebar">
@@ -183,6 +183,7 @@
       if (!completed.includes(id)) {
         completed.push(id);
         localStorage.setItem('completedLessons', JSON.stringify(completed));
+		console.log(id);
         updateLessonProgress();
       }
     }
